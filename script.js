@@ -125,6 +125,7 @@ Snake.prototype.move = function () {
   this.segments.unshift(newHead);
   if (newHead.equal(apple.position)) {
     score++;
+    // to do: Change snake color
     apple.move();
   } else {
     this.segments.pop();
