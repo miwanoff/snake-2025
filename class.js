@@ -31,5 +31,18 @@ class Block {
   };
 }
 
-const block = new Block(canvas, 10, 20);
-block.drawCircle();
+class Apple {
+  constructor(canvas) {
+    this.block = new Block(canvas, 10, 20);
+    this.color = "LimeGreen";
+    // this.canvas = canvas;    
+  }
+  draw = function () {
+    this.block.drawCircle(this.color);
+  };
+
+}
+// const block = new Block(canvas, 10, 20);
+// block.drawCircle();
+// const apple = new Apple(canvas);
+// apple.draw();
