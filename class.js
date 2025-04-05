@@ -29,20 +29,54 @@ class Block {
     this.context.fillStyle = color;
     this.circle(centerX, centerY, this.blockSize / 2);
   };
+
+  equal = function (otherBlock) {
+    return this.col === otherBlock.col && this.row === otherBlock.row;
+  };
 }
 
 class Apple {
   constructor(canvas) {
-    this.block = new Block(canvas, 10, 20);
+    this.block = new Block(canvas, 20, 30);
     this.color = "LimeGreen";
-    // this.canvas = canvas;    
+    this.canvas = canvas;
   }
   draw = function () {
     this.block.drawCircle(this.color);
   };
 
+  move = function () {
+    const widthInBlocks = this.canvas.width / this.block.blockSize;
+    const heightInBlocks = this.canvas.height / this.block.blockSize;
+    let randomCol = Math.floor(Math.random() * (widthInBlocks - 2)) + 1;
+    let randomRow = Math.floor(Math.random() * (heightInBlocks - 2)) + 1;
+    this.block = new Block(this.canvas, randomCol, randomRow);
+  };
 }
-// const block = new Block(canvas, 10, 20);
+
+class Snake {
+  constructor(canvas) {
+    this.segments = [new Block(canvas, 7, 5), new Block(canvas, 6, 5), new Block(canvas, 5, 5)];
+    this.direction = "right";
+    this.nextDirection = "right";
+    this.color = "blue";
+    this.canvas = canvas;
+  }
+
+  draw = function () {
+    for (let i = 0; i < this.segments.length; i++) {
+      this.segments[i].drawSquare(this.color);
+    }
+  };
+}
+
+// const block = new Block(canvas, 20, 30);
 // block.drawCircle();
 // const apple = new Apple(canvas);
 // apple.draw();
+// console.log(apple.block.equal(block));
+// apple.move();
+// apple.draw();
+
+const snake = new Snake(canvas);
+snake.draw();
