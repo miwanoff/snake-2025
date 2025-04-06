@@ -74,6 +74,8 @@ class Snake {
   };
 
   checkCollision = function (head) {
+    const widthInBlocks = this.canvas.width / this.segments[0].blockSize;
+    const heightInBlocks = this.canvas.height / this.segments[0].blockSize;
     const leftCollision = head.col === 0;
     const topCollision = head.row === 0;
     const rightCollision = head.col === widthInBlocks - 1;
@@ -144,12 +146,13 @@ class Game {
     };
     this.apple = new Apple(canvas);
     this.snake = new Snake(canvas);
+    this.blockSize = 10;
   }
 
   drawBorder = function (blockSize = 10) {
     this.context.fillStyle = "Gray";
     this.context.fillRect(0, 0, this.canvas.width, blockSize);
-    this.context.fillRect(0, this.canvas.height - blockSize, width, blockSize);
+    this.context.fillRect(0, this.canvas.height - blockSize, this.canvas.width, blockSize);
     this.context.fillRect(0, 0, blockSize, this.canvas.height);
     this.context.fillRect(
       this.canvas.width - blockSize,
@@ -159,12 +162,12 @@ class Game {
     );
   };
 
-  drawScore = function () {
+  drawScore = function (blockSize = 10) {
     this.context.font = "20px Courier";
     this.context.fillStyle = "Black";
     this.context.textAlign = "left";
     this.context.textBaseline = "top";
-    this.context.fillText("score: " + score, blockSize, blockSize);
+    this.context.fillText("score: " + this.score, blockSize, blockSize);
   };
 
   gameOver = function () {
@@ -192,9 +195,9 @@ class Game {
   start = function () {
     this.intervalId = setInterval(this.go.bind(this), 200);
     addEventListener("keydown", (event) => {
-      const newDirection = directions[event.keyCode];
+      const newDirection = this.directions[event.keyCode];
       if (newDirection !== undefined) {
-        snake.setDirection(newDirection);
+        this.snake.setDirection(newDirection);
       }
     });
   };
@@ -210,3 +213,6 @@ class Game {
 
 // const snake = new Snake(canvas);
 // snake.draw();
+
+const game = new Game(canvas)
+game.start();
