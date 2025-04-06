@@ -56,7 +56,11 @@ class Apple {
 
 class Snake {
   constructor(canvas) {
-    this.segments = [new Block(canvas, 7, 5), new Block(canvas, 6, 5), new Block(canvas, 5, 5)];
+    this.segments = [
+      new Block(canvas, 7, 5),
+      new Block(canvas, 6, 5),
+      new Block(canvas, 5, 5),
+    ];
     this.direction = "right";
     this.nextDirection = "right";
     this.color = "blue";
@@ -68,6 +72,132 @@ class Snake {
       this.segments[i].drawSquare(this.color);
     }
   };
+
+  checkCollision = function (head) {
+    const leftCollision = head.col === 0;
+    const topCollision = head.row === 0;
+    const rightCollision = head.col === widthInBlocks - 1;
+    const bottomCollision = head.row === heightInBlocks - 1;
+    const wallCollision =
+      leftCollision || topCollision || rightCollision || bottomCollision;
+    let selfCollision = false;
+    for (let i = 0; i < this.segments.length; i++) {
+      if (head.equal(this.segments[i])) {
+        selfCollision = true;
+      }
+    }
+    return wallCollision || selfCollision;
+  };
+
+  move = function (apple, game) {
+    const head = this.segments[0];
+    let newHead;
+    this.direction = this.nextDirection;
+    if (this.direction === "right") {
+      newHead = new Block(this.canvas, head.col + 1, head.row);
+    } else if (this.direction === "down") {
+      newHead = new Block(this.canvas, head.col, head.row + 1);
+    } else if (this.direction === "left") {
+      newHead = new Block(this.canvas, head.col - 1, head.row);
+    } else if (this.direction === "up") {
+      newHead = new Block(this.canvas, head.col, head.row - 1);
+    }
+    if (this.checkCollision(newHead)) {
+      game.gameOver();
+      return;
+    }
+    this.segments.unshift(newHead);
+    if (newHead.equal(apple.block)) {
+      game.score++;
+      // to do: Change snake color
+      apple.move();
+    } else {
+      this.segments.pop();
+    }
+  };
+
+  setDirection = function (newDirection) {
+    if (this.direction === "up" && newDirection === "down") {
+      return;
+    } else if (this.direction === "right" && newDirection === "left") {
+      return;
+    } else if (this.direction === "down" && newDirection === "up") {
+      return;
+    } else if (this.direction === "left" && newDirection === "right") {
+      return;
+    }
+    this.nextDirection = newDirection;
+  };
+}
+
+class Game {
+  intervalId;
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.context = canvas.getContext("2d");
+    this.score = 0;
+    this.directions = {
+      37: "left",
+      38: "up",
+      39: "right",
+      40: "down",
+    };
+    this.apple = new Apple(canvas);
+    this.snake = new Snake(canvas);
+  }
+
+  drawBorder = function (blockSize = 10) {
+    this.context.fillStyle = "Gray";
+    this.context.fillRect(0, 0, this.canvas.width, blockSize);
+    this.context.fillRect(0, this.canvas.height - blockSize, width, blockSize);
+    this.context.fillRect(0, 0, blockSize, this.canvas.height);
+    this.context.fillRect(
+      this.canvas.width - blockSize,
+      0,
+      blockSize,
+      this.canvas.height
+    );
+  };
+
+  drawScore = function () {
+    this.context.font = "20px Courier";
+    this.context.fillStyle = "Black";
+    this.context.textAlign = "left";
+    this.context.textBaseline = "top";
+    this.context.fillText("score: " + score, blockSize, blockSize);
+  };
+
+  gameOver = function () {
+    clearInterval(this.intervalId);
+    this.context.font = "60px Courier";
+    this.context.fillStyle = "Black";
+    this.context.textAlign = "center";
+    this.context.textBaseline = "middle";
+    this.context.fillText(
+      "game Over ",
+      this.canvas.width / 2,
+      this.canvas.height / 2
+    );
+  };
+
+  go = function () {
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.drawScore();
+    this.snake.move(this.apple, this);
+    this.snake.draw();
+    this.apple.draw();
+    this.drawBorder();
+  };
+
+  start = function () {
+    this.intervalId = setInterval(this.go.bind(this), 200);
+    addEventListener("keydown", (event) => {
+      const newDirection = directions[event.keyCode];
+      if (newDirection !== undefined) {
+        snake.setDirection(newDirection);
+      }
+    });
+  };
 }
 
 // const block = new Block(canvas, 20, 30);
@@ -78,5 +208,5 @@ class Snake {
 // apple.move();
 // apple.draw();
 
-const snake = new Snake(canvas);
-snake.draw();
+// const snake = new Snake(canvas);
+// snake.draw();
